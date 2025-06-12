@@ -64,6 +64,14 @@ module AccountComponent
           account
         end
       end
+
+      module Frozen
+        def self.example
+          account = Account.example
+          account.frozen_time = Time::Effective::Raw.example
+          account
+        end
+      end
     end
   end
 end

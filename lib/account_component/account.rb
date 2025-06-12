@@ -4,9 +4,10 @@ module AccountComponent
 
     attribute :id, String
     attribute :customer_id, String
-    attribute :balance, Numeric, default: 0
+    attribute :balance, Numeric, default: proc { 0 }
     attribute :opened_time, Time
     attribute :closed_time, Time
+    attribute :frozen_time, Time
     attribute :sequence, Integer
 
     def open?
@@ -15,6 +16,10 @@ module AccountComponent
 
     def closed?
       !closed_time.nil?
+    end
+
+    def frozen?
+      !frozen_time.nil?
     end
 
     def deposit(amount)

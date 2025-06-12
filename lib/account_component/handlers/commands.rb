@@ -59,6 +59,16 @@ module AccountComponent
         write.(closed, stream_name, expected_version: version)
       end
 
+      handle Freeze do |freeze|
+        transaction_stream_name = stream_name(freeze.freeze_id, 'accountTransaction')
+
+        freeze = Freeze.follow(freeze)
+
+        Try.(MessageStore::ExpectedVersion::Error) do
+          write.initial(freeze, transaction_stream_name)
+        end
+      end
+
       handle Deposit do |deposit|
         transaction_stream_name = stream_name(deposit.deposit_id, 'accountTransaction')
 

@@ -43,5 +43,12 @@ module AccountComponent
 
       account.closed_time = closed_time
     end
+
+    apply Frozen do |frozen|
+      frozen_time = Time.parse(frozen.time)
+
+      account.frozen_time = frozen_time
+      account.sequence = frozen.sequence
+    end
   end
 end

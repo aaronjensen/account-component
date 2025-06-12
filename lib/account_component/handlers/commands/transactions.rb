@@ -34,11 +34,21 @@ module AccountComponent
 
           time = clock.iso8601
 
+          stream_name = stream_name(account_id)
+
+          if account.frozen?
+            deposit_rejected = DepositRejected.follow(deposit)
+            deposit_rejected.time = time
+            deposit_rejected.sequence = sequence
+
+            write.(deposit_rejected, stream_name, expected_version: version)
+
+            return
+          end
+
           deposited = Deposited.follow(deposit)
           deposited.processed_time = time
           deposited.sequence = sequence
-
-          stream_name = stream_name(account_id)
 
           write.(deposited, stream_name, expected_version: version)
         end
@@ -58,6 +68,16 @@ module AccountComponent
           time = clock.iso8601
 
           stream_name = stream_name(account_id)
+
+          if account.frozen?
+            withdrawal_rejected = WithdrawalRejected.follow(withdraw)
+            withdrawal_rejected.time = time
+            withdrawal_rejected.sequence = sequence
+
+            write.(withdrawal_rejected, stream_name, expected_version: version)
+
+            return
+          end
 
           unless account.sufficient_funds?(withdraw.amount)
             withdrawal_rejected = WithdrawalRejected.follow(withdraw)

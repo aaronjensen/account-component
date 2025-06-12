@@ -38,6 +38,10 @@ module AccountComponent
       account.sequence = withdrawal_rejected.sequence
     end
 
+    apply DepositRejected do |deposit_rejected|
+      account.sequence = deposit_rejected.sequence
+    end
+
     apply Closed do |closed|
       closed_time = Time.parse(closed.time)
 

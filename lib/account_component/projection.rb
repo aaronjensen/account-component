@@ -50,5 +50,10 @@ module AccountComponent
       account.frozen_time = frozen_time
       account.sequence = frozen.sequence
     end
+
+    apply Unfrozen do |unfrozen|
+      account.unfreeze
+      account.sequence = unfrozen.sequence
+    end
   end
 end

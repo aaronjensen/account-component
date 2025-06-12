@@ -103,6 +103,34 @@ module AccountComponent
 
           write.(frozen, stream_name, expected_version: version)
         end
+
+        handle RemoveFreeze do |remove_freeze|
+          account_id = remove_freeze.account_id
+
+          account, version = store.fetch(account_id, include: :version)
+
+          sequence = remove_freeze.metadata.global_position
+
+          if account.processed?(sequence)
+            logger.info(tag: :ignored) { "Command ignored (Command: #{remove_freeze.message_type}, Account ID: #{account_id}, Account Sequence: #{account.sequence}, RemoveFreeze Sequence: #{sequence})" }
+            return
+          end
+
+          unless account.frozen?
+            logger.info(tag: :ignored) { "Command ignored (Command: #{remove_freeze.message_type}, Account ID: #{account_id}) - Account not frozen" }
+            return
+          end
+
+          time = clock.iso8601
+
+          unfrozen = Unfrozen.follow(remove_freeze)
+          unfrozen.processed_time = time
+          unfrozen.sequence = sequence
+
+          stream_name = stream_name(account_id)
+
+          write.(unfrozen, stream_name, expected_version: version)
+        end
       end
     end
   end

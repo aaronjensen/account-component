@@ -22,6 +22,10 @@ module AccountComponent
       !frozen_time.nil?
     end
 
+    def unfreeze
+      self.frozen_time = nil
+    end
+
     def deposit(amount)
       self.balance += amount
     end

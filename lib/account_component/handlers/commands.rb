@@ -69,6 +69,16 @@ module AccountComponent
         end
       end
 
+      handle RemoveFreeze do |remove_freeze|
+        transaction_stream_name = stream_name(remove_freeze.remove_freeze_id, 'accountTransaction')
+
+        remove_freeze = RemoveFreeze.follow(remove_freeze)
+
+        Try.(MessageStore::ExpectedVersion::Error) do
+          write.initial(remove_freeze, transaction_stream_name)
+        end
+      end
+
       handle Deposit do |deposit|
         transaction_stream_name = stream_name(deposit.deposit_id, 'accountTransaction')
 
